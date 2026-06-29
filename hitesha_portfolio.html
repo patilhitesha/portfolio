@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hitesha Patil — UI/UX Designer & Developer</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <!-- React + ReactDOM + Babel (CDN, no build tools needed) -->
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+
+  <!-- ═══════════════════════════════ CSS ═══════════════════════════════ -->
+  <style>
+    /* Reset & Base */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #ffffff;
+      color: #1a1a1a;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    ::selection { background: #6B3FF5; color: #fff; }
+    a { text-decoration: none; }
+    button { cursor: pointer; }
+    img { display: block; max-width: 100%; }
+
+    /* ── Scroll Fade Animations ── */
+    .fade-up   { opacity: 0; transform: translateY(28px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .fade-left { opacity: 0; transform: translateX(-28px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .fade-right{ opacity: 0; transform: translateX(28px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .fade-up.visible, .fade-left.visible, .fade-right.visible {
+      opacity: 1; transform: none;
+    }
+
+    /* ── Navigation ── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 999;
+      transition: background 0.3s, box-shadow 0.3s, border-bottom 0.3s;
+      padding: 0 48px;
+    }
+    nav.scrolled {
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid #F0F0F0;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto;
+      height: 64px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700; font-size: 1.35rem; color: #1a1a1a;
+      letter-spacing: -0.01em;
+    }
+    .nav-links { display: flex; gap: 36px; }
+    .nav-link {
+      position: relative; font-size: 0.8rem; font-weight: 500;
+      color: #666; letter-spacing: 0.07em; text-transform: uppercase;
+      background: none; border: none; padding: 0;
+      transition: color 0.2s;
+    }
+    .nav-link::after {
+      content: ''; position: absolute; left: 0; bottom: -4px;
+      width: 0; height: 1.5px; background: #6B3FF5;
+      transition: width 0.25s ease;
+    }
+    .nav-link:hover, .nav-link.active { color: #1a1a1a; }
+    .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 32px; background: #880849; color: #ffffff;
+      border: none; border-radius: 100px;
+      font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 600;
+      letter-spacing: 0.02em;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { background: #f0abda; transform: translateY(-1px); }
+
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 28px; border: 1.5px solid #ccc; background: transparent;
+      color: #1a1a1a; border-radius: 100px;
+      font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 500;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-outline:hover { border-color: #6B3FF5; color: #880849; }
+
+    /* ── Tags / Pills ── */
+    .tag {
+      padding: 4px 12px; background: #F3EFFF; color: #6B3FF5;
+      border-radius: 100px; font-size: 0.73rem; font-weight: 500;
+      display: inline-block;
+    }
+    .availability-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 6px 16px; border: 1px solid #E0E0E0; border-radius: 100px;
+      font-size: 0.78rem; font-weight: 500; color: #030303;
+      letter-spacing: 0.02em; margin-bottom: 28px;
+    }
+    .availability-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: #880849;
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 5; }
+      50% { opacity: 0.35; }
+    }
+
+    /* ── Section Eyebrow ── */
+    .eyebrow {
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: #6B3FF5; margin-bottom: 10px; display: block;
+    }
+
+    /* ── Sections ── */
+    section { padding: 100px 48px; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-alt { background: #FAFAFA; }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      font-weight: 700; margin-bottom: 56px;
+      line-height: 1.15; letter-spacing: -0.01em;
+    }
+
+    /* ── Hero ── */
+    #home {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated background layer */
+#home::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #6B3FF5, #9B6DFF, #F0ABDA);
+  opacity: 0.5; /* 50% opacity */
+  animation: bgMove 12s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+/* Keep your content above the background */
+#home > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes bgMove {
+  0% { transform: scale(1) translate(0,0); }
+  50% { transform: scale(1.1) translate(-20px, 20px); }
+  100% { transform: scale(1) translate(0,0); }
+}
+@keyframes bgShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+
+    .hero-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: center;
+    }
+    .hero-h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 5vw, 4.4rem);
+      font-weight: 700; line-height: 1.08;
+      letter-spacing: -0.025em; margin-bottom: 22px;
+    }
+    .hero-h1 .accent { color: #6B3FF5; }
+    .hero-sub {
+      font-size: 1rem; line-height: 1.8; color: #555;
+      max-width: 420px; margin-bottom: 36px;
+    }
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+    .hero-stats {
+      margin-top: 72px; padding-top: 40px;
+      border-top: 1px solid #EEEEEE;
+      display: flex; gap: 56px; flex-wrap: wrap;
+    }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem; font-weight: 700; color: #1a1a1a;
+    }
+    .stat-label { font-size: 0.78rem; color: #1a1a1a; margin-top: 2px; letter-spacing: 0.03em; }
+
+    /* Hero visual */
+    .hero-visual-wrap { position: relative; }
+    .hero-bg-shape {
+      position: absolute; inset: -20px; border-radius: 32px;
+      background: #F3EFFF; z-index: 0;
+    }
+    .hero-card {
+      position: relative; z-index: 1; border-radius: 24px; overflow: hidden;
+      aspect-ratio: 4/5;
+      background: linear-gradient(145deg, #6B3FF5 0%, #9B6DFF 55%, #F0ABDA 100%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 0;
+    }
+    .hero-monogram-ring {
+      .hero-ring-image {
+	   width: 210px;
+       height: 210px;
+	   object-fit: cover;   /* ensures the image fills the circle */
+	   border-radius: 50%;  /* makes the image circular */
+}
+
+    }
+    .hero-monogram {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem; color: #fff; font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+    .hero-card-label {
+      margin-top: 26px; text-align: center; padding: 0 20px;
+      font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 0.13em; text-transform: uppercase;
+      color: rgba(255,255,255,0.88);
+    }
+    .hero-card-dots {
+      position: absolute; bottom: 32px;
+      display: flex; gap: 8px;
+    }
+    .hero-card-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #880849;
+	  animation: bounce 0.8s infinite alternate;
+    }
+	@keyframes bounce {
+	  from { transform: translateY(0); }
+	  to { transform: translateY(-6px); }
+	}
+    .hero-accent-circle {
+	  position: absolute; bottom: -12px; left: -12px;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: #EDE8FF; border: 3px solid #fff; z-index: 2;
+	  box-shadow: 0 0 12px rgba(107,63,245,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+      color: #6B3FF5;
+    }
+
+    /* ── About ── */
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: start; }
+    .about-text p { font-size: 0.93rem; line-height: 1.88; color: #444; margin-bottom: 18px; }
+    .about-contact { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .about-contact a, .about-contact span {
+      display: inline-flex; align-items: center; gap: 9px;
+      font-size: 0.87rem; color: #6B3FF5; font-weight: 500;
+    }
+    .about-contact span { color: #888; }
+    .about-links { display: flex; gap: 10px; flex-wrap: wrap; }
+    .about-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .about-card {
+      padding: 20px 22px; background: #fff;
+      border: 1px solid #EBEBEB; border-radius: 14px;
+    }
+    .about-card-title { font-weight: 600; font-size: 0.84rem; color: #1a1a1a; margin-bottom: 5px; }
+    .about-card-desc { font-size: 0.77rem; color: #999; line-height: 1.6; }
+
+    /* ── Experience ── */
+    .exp-list { display: flex; flex-direction: column; gap: 20px; }
+    .exp-card {
+      border: 1px solid #E8E8E8; border-radius: 16px; padding: 36px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .exp-card:hover {
+      border-color: #6B3FF5;
+      box-shadow: 0 4px 28px rgba(107,63,245,0.08);
+    }
+    .exp-head { display: flex; gap: 20px; align-items: flex-start; }
+    .exp-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: #F3EFFF; display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0;
+    }
+    .exp-icon svg { width: 20px; height: 20px; stroke: #6B3FF5; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .exp-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; font-weight: 500; margin-bottom: 4px;
+    }
+    .exp-company { color: #6B3FF5; font-weight: 600; font-size: 0.87rem; margin-bottom: 8px; }
+    .exp-meta {
+      display: flex; gap: 20px; color: #aaa; font-size: 0.79rem;
+      margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .exp-meta span { display: inline-flex; align-items: center; gap: 4px; }
+    .exp-meta svg { width: 13px; height: 13px; stroke: #bbb; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .exp-points { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .exp-points li {
+      display: flex; gap: 10px;
+      font-size: 0.87rem; line-height: 1.68; color: #444;
+    }
+    .exp-arrow { color: #6B3FF5; margin-top: 2px; flex-shrink: 0; font-style: normal; }
+
+    /* ── Skills ── */
+    .skills-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+    .skill-card {
+      border: 1px solid #E8E8E8; border-radius: 16px; padding: 32px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .skill-card:hover {
+      border-color: #6B3FF5;
+      box-shadow: 0 4px 28px rgba(107,63,245,0.08);
+    }
+    .skill-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: #F3EFFF; display: flex; align-items: center;
+      justify-content: center; margin-bottom: 20px;
+    }
+    .skill-icon svg { width: 22px; height: 22px; stroke: #6B3FF5; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .skill-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 500; margin-bottom: 16px;
+    }
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    /* ── Projects ── */
+    .projects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .proj-card {
+      border: 1px solid #E8E8E8; border-radius: 16px;
+      overflow: hidden; transition: box-shadow 0.2s, transform 0.25s;
+    }
+    .proj-card:hover { box-shadow: 0 8px 36px rgba(0,0,0,0.09); transform: translateY(-4px); }
+    .proj-img-wrap { overflow: hidden; }
+    .proj-card img {
+      width: 100%; aspect-ratio: 16/9; object-fit: cover;
+      display: block; filter: grayscale(8%);
+      transition: filter 0.35s, transform 0.45s;
+    }
+    .proj-card:hover img { filter: grayscale(0%); transform: scale(1.04); }
+    .proj-body { padding: 24px 28px; }
+    .proj-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.08rem; font-weight: 500; margin-bottom: 8px;
+    }
+    .proj-desc { color: #777; font-size: 0.85rem; line-height: 1.72; margin-bottom: 16px; }
+    .proj-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    /* ── Contact ── */
+	
+    .contact-wrap { max-width: 680px; margin: 0 auto; }
+    .contact-card {
+      background: #fff; border: 1px solid #EBEBEB;
+      border-radius: 20px; padding: 40px 44px; margin-bottom: 32px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .form-group { margin-bottom: 0; }
+    .form-label {
+      display: block; font-size: 0.78rem; font-weight: 600;
+      color: #888; letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+    .form-input, .form-textarea {
+      width: 100%; padding: 12px 16px;
+      border: 1px solid #E0E0E0; border-radius: 10px;
+      font-family: 'Inter', sans-serif; font-size: 0.9rem;
+      color: #1a1a1a; background: #FAFAFA; outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .form-input:focus, .form-textarea:focus {
+      border-color: #6B3FF5; background: #fff;
+    }
+    .form-textarea { resize: none; }
+    .form-submit { width: 100%; justify-content: center; }
+    .contact-email-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.85rem; color: #6B3FF5; font-weight: 500;
+      border: 1.5px solid #E5DEFF; border-radius: 100px;
+      padding: 10px 22px; transition: background 0.2s;
+    }
+    .contact-email-link:hover { background: #F3EFFF; }
+    .contact-email-row { display: flex; justify-content: center; }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid #F0F0F0; padding: 28px 48px; text-align: center;
+    }
+    footer p { font-size: 0.78rem; color: #C0C0C0; letter-spacing: 0.02em; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      nav { padding: 0 24px; }
+      section { padding: 80px 24px; }
+      footer { padding: 24px; }
+      .nav-links { display: none; }
+      .hero-grid, .about-grid { grid-template-columns: 1fr; gap: 48px; }
+      .hero-visual-wrap { max-width: 340px; margin: 0 auto; }
+      .hero-stats { gap: 32px; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .contact-card { padding: 28px 24px; }
+      .about-cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="root"></div>
+
+  <!-- ═══════════════════════════════ JSX / React ═══════════════════════════════ -->
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    /* ── SVG Icons (inline — no lucide dependency needed) ─────────────── */
+    const Icon = ({ d, d2, size = 16, style = {} }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+        <path d={d} />
+        {d2 && <path d={d2} />}
+      </svg>
+    );
+
+    const icons = {
+      arrowRight:  'M5 12h14 M12 5l7 7-7 7',
+      download:    'M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4 M7 10l5 5 5-5 M12 15V3',
+      mail:        'M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z M22 6l-10 7L2 6',
+      mapPin:      'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z M12 7a3 3 0 100 6 3 3 0 000-6z',
+      calendar:    'M8 2v4 M16 2v4 M3 8h18 M21 6H3a2 2 0 00-2 2v12a2 2 0 002 2h18a2 2 0 002-2V8a2 2 0 00-2-2z',
+      briefcase:   'M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2',
+      palette:     'M12 2a10 10 0 100 20 10 10 0 000-20z M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32',
+      code2:       'M18 16l4-4-4-4 M6 8l-4 4 4 4 M14.5 4l-5 16',
+      monitor:     'M4 3h16a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2z M8 21h8 M12 17v4',
+    };
+
+    /* ── Scroll fade hook ─────────────────────────────────────────────── */
+    function useFadeIn(threshold = 0.12) {
+      const ref = useRef(null);
+      const [visible, setVisible] = useState(false);
+      useEffect(() => {
+        const obs = new IntersectionObserver(
+          ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+          { threshold }
+        );
+        if (ref.current) obs.observe(ref.current);
+        return () => obs.disconnect();
+      }, []);
+      return [ref, visible];
+    }
+
+    /* ── Scroll Y ─────────────────────────────────────────────────────── */
+    function useScrollY() {
+      const [y, setY] = useState(0);
+      useEffect(() => {
+        const h = () => setY(window.scrollY);
+        window.addEventListener('scroll', h, { passive: true });
+        return () => window.removeEventListener('scroll', h);
+      }, []);
+      return y;
+    }
+
+    /* ── FadeBox ──────────────────────────────────────────────────────── */
+    function FadeBox({ children, dir = 'up', delay = 0, style: s = {} }) {
+      const [ref, visible] = useFadeIn();
+      const cls = dir === 'left' ? 'fade-left' : dir === 'right' ? 'fade-right' : 'fade-up';
+      return (
+        <div
+          ref={ref}
+          className={`${cls}${visible ? ' visible' : ''}`}
+          style={{ transitionDelay: `${delay}s`, ...s }}
+        >
+          {children}
+        </div>
+      );
+    }
+
+    /* ── Nav ──────────────────────────────────────────────────────────── */
+    function Nav({ active, scrollTo }) {
+      const y = useScrollY();
+      const sections = ['Home', 'About', 'Experience', 'Skills', 'Projects', 'Contact'];
+      return (
+        <nav className={y > 40 ? 'scrolled' : ''}>
+          <div className="nav-inner">
+            <span className="nav-logo">HP.</span>
+            <div className="nav-links">
+              {sections.map(s => (
+                <button
+                  key={s}
+                  className={`nav-link${active === s.toLowerCase() ? ' active' : ''}`}
+                  onClick={() => scrollTo(s.toLowerCase())}
+                >{s}</button>
+              ))}
+            </div>
+          </div>
+        </nav>
+      );
+    }
+
+    /* ── Hero Section ─────────────────────────────────────────────────── */
+    function Hero({ scrollTo }) {
+      return (
+        <section id="home">
+          <div className="section-inner">
+            <div className="hero-grid">
+
+              {/* Left */}
+              <div>
+                <FadeBox>
+                  <div className="availability-pill">
+                    <span className="availability-dot"></span>
+                    Available for opportunities
+                  </div>
+                </FadeBox>
+                <FadeBox delay={0.1}>
+                  hey!<h1 className="hero-h1">
+                    Hitesha<br />
+                    <span className="accent">Patil</span>
+                  </h1>
+                </FadeBox>
+                <FadeBox delay={0.2}>
+                  <p className="hero-sub">
+                    UI/UX Designer, Graphic Designer & Front-End Developer building
+                    user-centered digital products - from Figma prototypes to React.js in production.
+                  </p>
+                </FadeBox>
+                <FadeBox delay={0.3}>
+                  <div className="hero-btns">
+                    <a
+                      href="https://drive.google.com/file/d/1DhZgMo_pA2BV5zuzUa1db76FGBU5R6Ed/view?usp=drive_link"
+                      target="_blank" rel="noopener noreferrer"
+                      className="btn-primary"
+                    >
+                      View My Work
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                    </a>
+                    <a
+                      href="https://drive.google.com/file/d/1kDsQ1bi0pjSAbRsd0G2PbFsxyWkjE4GN/view?usp=drive_link"
+                      target="_blank" rel="noopener noreferrer"
+                      className="btn-outline"
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+                      Resume
+                    </a>
+                    <button className="btn-outline" onClick={() => scrollTo('contact')}>
+                      Get In Touch
+                    </button>
+                  </div>
+                </FadeBox>
+
+                {/* Stats */}
+                <FadeBox delay={0.45}>
+                  <div className="hero-stats">
+                    {[['1+', 'Years Experience'], ['10+', 'Projects Delivered'], ['3+','Disciplines']].map(([n, l]) => (
+                      <div key={l}>
+                        <div className="stat-num">{n}</div>
+                        <div className="stat-label">{l}</div>
+                      </div>
+                    ))}
+                  </div>
+                </FadeBox>
+              </div>
+
+              {/* Right — Monogram visual */}
+              <FadeBox dir="right" delay={0.2}>
+                <div className="hero-visual-wrap">
+                  <div className="hero-bg-shape"></div>
+                  <div className="hero-card">
+                    <div class="hero-monogram-ring">
+					<img src="photo.jpeg" alt="Hitesha Patil" class="hero-ring-image"/>
+					</div>
+                    <p className="hero-card-label">UI/UX · Graphic · Dev</p>
+                    <div className="hero-card-dots">
+                      <div className="hero-card-dot"></div>
+                      <div className="hero-card-dot"></div>
+                      <div className="hero-card-dot"></div>
+                    </div>
+                  </div>
+                  <div className="hero-accent-circle">HP</div>
+                </div>
+              </FadeBox>
+
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    /* ── About Section ────────────────────────────────────────────────── */
+    function About() {
+      return (
+        <section id="about" className="section-alt">
+          <div className="section-inner">
+            <FadeBox>
+              <span className="eyebrow">About</span>
+              <h2 className="section-title">
+                Designing with intent,<br />building with care
+              </h2>
+            </FadeBox>
+            <div className="about-grid">
+              <FadeBox dir="left" delay={0.15}>
+                <div className="about-text">
+                  <p>
+                    I'm a UI/UX Designer, Graphic Designer, and Front-End Developer with hands-on
+                    production experience designing and shipping end-to-end digital products.
+                    Currently pursuing B.E. in Computer Science at Mumbai University (CGPA 8.0)
+                    while working on real-world projects.
+                  </p>
+                  <p>
+                    From Figma prototypes to React.js implementation, I've solely designed and
+                    developed production websites, managed complete brand identities, and delivered
+                    user-centered solutions across the full project lifecycle. Clean code, intuitive
+                    design, and accessibility-first approach (WCAG compliant).
+                  </p>
+                  <div className="about-contact">
+                    <a href="mailto:hiteshapatil9@gmail.com">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                      hiteshapatil9@gmail.com
+                    </a>
+                    <span>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      Navi Mumbai, India
+                    </span>
+                  </div>
+                  <div className="about-links">
+                    <a href="https://github.com/patilhitesha" target="_blank" rel="noopener noreferrer" className="btn-outline" style={{padding:'8px 20px',fontSize:'0.8rem'}}>GitHub</a>
+                    <a href="https://www.linkedin.com/in/hitesha-patil-754535341/" target="_blank" rel="noopener noreferrer" className="btn-outline" style={{padding:'8px 20px',fontSize:'0.8rem'}}>LinkedIn</a>
+                  </div>
+                </div>
+              </FadeBox>
+              <FadeBox dir="right" delay={0.25}>
+                <div className="about-cards">
+                  {[
+                    ['UI/UX Design', 'Figma, prototyping, user research, design systems'],
+                    ['Front-End Dev', 'React.js, TypeScript, Tailwind CSS, HTML/CSS'],
+                    ['Graphic Design', 'Adobe Photoshop, Canva Pro, brand identity'],
+                    ['Accessibility', 'WCAG compliant, inclusive design practices'],
+                  ].map(([title, desc]) => (
+                    <div className="about-card" key={title}>
+                      <div className="about-card-title">{title}</div>
+                      <div className="about-card-desc">{desc}</div>
+                    </div>
+                  ))}
+                </div>
+              </FadeBox>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    /* ── Experience Section ───────────────────────────────────────────── */
+    const experiences = [
+      {
+        title: 'Graphic Designer & Front-End Developer',
+        company: 'Capstone Consultancy',
+        location: 'Panvel, Navi Mumbai · Hybrid',
+        period: 'Jan 2025 – May 2026',
+        points: [
+          "Solely designed and developed the company's production website end-to-end — conducted UX research, built high-fidelity Figma prototypes, and implemented the full front-end in React.js and Tailwind CSS.",
+          "Owned complete brand identity system: logos, brochures, festival banners, and social media creatives using Canva Pro and Adobe Photoshop for real-estate digital marketing campaigns.",
+          "Managed full project lifecycle as sole designer and developer — from wireframes and design system to deployment; iterated to client-ready deliverables.",
+        ],
+      },
+      {
+        title: 'Web Designer & Content Manager',
+        company: 'Education Institute',
+        location: 'Vashi, Navi Mumbai · Freelance / Remote',
+        period: 'Jun 2024 – Dec 2024',
+        points: [
+          "Maintained and updated the institute website with faculty profiles, course listings, and imagery; improved user flows to boost engagement for prospective students.",
+          "Redesigned information architecture to simplify navigation; created institutional graphics and promotional visuals aligned to brand identity.",
+        ],
+      },
+      {
+        title: 'Freelance UI/UX Designer & Graphic Designer',
+        company: 'Independent',
+        location: 'Remote',
+        period: '2024 – 2026',
+        points: [
+          "Delivered UI/UX design, graphic design, and front-end solutions for multiple clients across full project lifecycle from brief to final handoff.",
+          "Produced brand kits, social media creatives, web mockups, and landing page designs with consistent client satisfaction.",
+        ],
+      },
+    ];
+
+    function Experience() {
+      return (
+        <section id="experience">
+          <div className="section-inner">
+            <FadeBox>
+              <span className="eyebrow">Experience</span>
+              <h2 className="section-title">Where I've worked</h2>
+            </FadeBox>
+            <div className="exp-list">
+              {experiences.map((exp, i) => (
+                <FadeBox key={exp.company} delay={i * 0.1}>
+                  <div className="exp-card">
+                    <div className="exp-head">
+                      <div className="exp-icon">
+                        {/* Briefcase SVG */}
+                        <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+                      </div>
+                      <div style={{flex:1}}>
+                        <h3 className="exp-title">{exp.title}</h3>
+                        <p className="exp-company">{exp.company}</p>
+                        <div className="exp-meta">
+                          <span>
+                            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            {exp.location}
+                          </span>
+                          <span>
+                            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            {exp.period}
+                          </span>
+                        </div>
+                        <ul className="exp-points">
+                          {exp.points.map((pt, j) => (
+                            <li key={j}>
+                              <em className="exp-arrow">→</em>
+                              <span>{pt}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </FadeBox>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    /* ── Skills Section ───────────────────────────────────────────────── */
+    const skillSets = [
+      {
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="#6B3FF5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="22" height="22">
+            <circle cx="13.5" cy="6.5" r="4"/><path d="M19.5 17.5a6 6 0 00-12 0"/>
+            <path d="M6.5 6.5a4 4 0 00-4 4 4 4 0 004 4"/>
+          </svg>
+        ),
+        title: 'UI/UX Design',
+        skills: ['Figma', 'Prototyping', 'Wireframing', 'User Research', 'Design Systems', 'Accessibility (WCAG)'],
+      },
+      {
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="#6B3FF5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="22" height="22">
+            <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+            <line x1="12" y1="3" x2="12" y2="21" strokeDasharray="3 2"/>
+          </svg>
+        ),
+        title: 'Frontend Development',
+        skills: ['React.js', 'TypeScript', 'Tailwind CSS', 'HTML5', 'CSS3', 'JavaScript (ES6+)'],
+      },
+      {
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="#6B3FF5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="22" height="22">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        ),
+        title: 'Graphic Design & Tools',
+        skills: ['Adobe Photoshop', 'Canva Pro', 'Logo Design', 'Brand Identity', 'Social Media', 'Git/GitHub'],
+      },
+    ];
+
+    function Skills() {
+      return (
+        <section id="skills" className="section-alt">
+          <div className="section-inner">
+            <FadeBox>
+              <span className="eyebrow">Skills</span>
+              <h2 className="section-title">Expertise & tools</h2>
+            </FadeBox>
+            <div className="skills-grid">
+              {skillSets.map((s, i) => (
+                <FadeBox key={s.title} delay={i * 0.1}>
+                  <div className="skill-card">
+                    <div className="skill-icon">{s.icon}</div>
+                    <h3 className="skill-title">{s.title}</h3>
+                    <div className="skill-tags">
+                      {s.skills.map(sk => <span key={sk} className="tag">{sk}</span>)}
+                    </div>
+                  </div>
+                </FadeBox>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    /* ── Projects Section ─────────────────────────────────────────────── */
+    const projects = [
+      {
+        title: 'Capstone Consultancy Website',
+        description: 'Full production company website as sole designer and developer — reusable component library and design system ensuring visual consistency and scalability.',
+        image: 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=700&q=80',
+        tags: ['React.js', 'TypeScript', 'Tailwind CSS', 'Figma'],
+      },
+      {
+        title: 'Hospital Appointment System',
+        description: 'Responsive appointment booking system with WCAG-compliant UI/UX patterns and intuitive user flows to reduce friction in healthcare interactions.',
+        image: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=700&q=80',
+        tags: ['HTML5', 'CSS3', 'JavaScript', 'React.js'],
+      },
+      {
+        title: 'Brand Identity & Digital Marketing',
+        description: 'Complete brand identity system — logos, brochures, festival banners, and social media creatives for real-estate digital marketing campaigns.',
+        image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=700&q=80',
+        tags: ['Canva Pro', 'Adobe Photoshop', 'Branding'],
+      },
+      {
+        title: 'Educational Institute Website',
+        description: 'Website redesign with improved information architecture, faculty profiles, course listings, and promotional visuals aligned to brand identity.',
+        image: 'https://lens.usercontent.google.com/banana?agsi=CmdnbG9iYWw6OjAwMDA1NWNmZWM3MDAyNmQ6MDAwMDAwZWI6MTo2Njg4YWIwZWMzOWIwZTZmOjAwMDA1NWNmZWM3MDAyNmQ6MDAwMDAyZjNlZDUwMzM2ODowMDA2NTU2NGIyYzExYzJmEAIYAQ==',
+        tags: ['Web Design', 'Content Management', 'UI/UX'],
+      },
+    ];
+
+    function Projects() {
+      return (
+        <section id="projects">
+          <div className="section-inner">
+            <FadeBox>
+              <span className="eyebrow">Projects</span>
+              <h2 className="section-title">Featured work</h2>
+            </FadeBox>
+            <div className="projects-grid">
+              {projects.map((p, i) => (
+                <FadeBox key={p.title} delay={i * 0.1}>
+                  <div className="proj-card">
+                    <div className="proj-img-wrap">
+                      <img src={p.image} alt={p.title} loading="lazy" />
+                    </div>
+                    <div className="proj-body">
+                      <h3 className="proj-title">{p.title}</h3>
+                      <p className="proj-desc">{p.description}</p>
+                      <div className="proj-tags">
+                        {p.tags.map(t => <span key={t} className="tag">{t}</span>)}
+                      </div>
+                    </div>
+                  </div>
+                </FadeBox>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    /* ── Contact Section ──────────────────────────────────────────────── */
+    function Contact() {
+      return (
+        <section id="contact" className="section-alt">
+          <div className="section-inner">
+            <div className="contact-wrap">
+              <FadeBox>
+                <span className="eyebrow">Contact</span>
+                <h2 className="section-title" style={{marginBottom:12}}>
+                  Let's work together
+                </h2>
+                <p style={{color:'#888', fontSize:'0.95rem', lineHeight:1.72, marginBottom:48}}>
+                  I'm open to new opportunities and collaborations. Feel free to reach out!
+                </p>
+              </FadeBox>
+              <FadeBox delay={0.15}>
+                <div className="contact-card">
+                  <form action="mailto:hiteshapatil9@gmail.com" method="GET">
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label className="form-label">Name</label>
+                        <input type="text" name="subject" placeholder="Your name" className="form-input" />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Email</label>
+                        <input type="email" placeholder="your@email.com" className="form-input" />
+                      </div>
+                    </div>
+                    <div style={{marginBottom:24}}>
+                      <label className="form-label">Message</label>
+                      <textarea name="body" placeholder="Tell me about your project..." rows="5" className="form-input form-textarea"></textarea>
+                    </div>
+                    <button type="submit" className="btn-primary form-submit">
+                      Send Message
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                    </button>
+                  </form>
+                </div>
+              </FadeBox>
+              <FadeBox delay={0.25}>
+                <div className="contact-email-row">
+                  <a href="mailto:hiteshapatil9@gmail.com" className="contact-email-link">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    hiteshapatil9@gmail.com
+                  </a>
+                </div>
+              </FadeBox>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    /* ── App ──────────────────────────────────────────────────────────── */
+    function App() {
+      const [activeSection, setActiveSection] = useState('home');
+
+      // Active section tracking
+      useEffect(() => {
+        const sections = ['home', 'about', 'experience', 'skills', 'projects', 'contact'];
+        const handler = () => {
+          const current = sections.find(id => {
+            const el = document.getElementById(id);
+            if (!el) return false;
+            const r = el.getBoundingClientRect();
+            return r.top <= 130 && r.bottom >= 130;
+          });
+          if (current) setActiveSection(current);
+        };
+        window.addEventListener('scroll', handler, { passive: true });
+        return () => window.removeEventListener('scroll', handler);
+      }, []);
+
+      const scrollTo = (id) => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+      };
+
+      return (
+        <>
+          <Nav active={activeSection} scrollTo={scrollTo} />
+          <Hero scrollTo={scrollTo} />
+          <About />
+          <Experience />
+          <Skills />
+          <Projects />
+          <Contact />
+          <footer>
+            <p>© Hitesha Patil✨. Designed & built with 🩷.</p>
+          </footer>
+        </>
+      );
+    }
+
+    /* ── Mount ────────────────────────────────────────────────────────── */
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+
+</body>
+</html>
